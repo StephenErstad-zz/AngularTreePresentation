@@ -4,10 +4,10 @@
     <head>
         <meta charset="utf-8">
 
-        <title>AngularJS Tree</title>
+        <title>AngularJS Tree Directive</title>
 
-        <meta name="description" content="A high performance tree control for AngularJS">
-        <meta name="author" content="Troy Dey">
+        <meta name="description" content="Building a high performance tree control for AngularJS">
+        <meta name="author" content="Troy Dey & Stephen Erstad">
 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -42,31 +42,98 @@
             <div class="slides">
                 <section>
                     <h1>AngularJS Tree Directive</h1>
-                    <h3>An Adventure</h3>
+                    <h3>Building a high performance tree control for AngularJS</h3>
                     <p>
-                        <small>Created by <a href="">Troy Dey</a> / <a href="">@foo</a></small>
-                        <small>And <a href="">Stephen Erstad</a> / <a href="">@foo</a></small>
+                        <small>Created by <a href="">Troy Dey</a></small>
+                        <small>And <a href="">Stephen Erstad</a></small>
                     </p>
                 </section>
 
-                <section>
-                    <h2>What Does the Tree Need to Do?</h2>
-                    <ul>
-                        <li>
-                        What our needs were
-                        </li>
-                        <li>How existing tree controls did not meet those needs</li>
-                    </ul>
+               <section>
+                    <section>
+                        <h2>What's in a tree?</h2>
+                        <p>What features do we need?</p>
+                        <p>What are our performance requirments?</p>
+                    </section>
+                    <section>
+                        <h2>Features</h2>
+                        <ul>
+                           <li>Multiple Roots</li>
+                            <li>
+                                Add
+                                <ul>
+                                    <li>As Child</li>
+                                    <li>As Sibling</li>
+                                    <li>As Root</li>
+                                </ul>
+                            </li>
+                            <li>Edit</li>
+                            <li>Delete</li>
+                            <li>
+                                Move subtrees
+                                <ul>
+                                    <li>As Child</li>
+                                    <li>As Sibling</li>
+                                </ul>
+                            </li>
+                            <li>Select/Deselect</li>
+                            <li>Containing Controller Interaction</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Performance</h2>
+                        <ul>
+                            <li>Total # Nodes: > 10k</li>
+                            <li>Depth: > 10</li>
+                            <li>Memory Restriction: &lt; 50MB for 10k nodes</li>
+                            <li>Time to Render: &lt; 3 sec for 10k nodes</li>
+                            <li>Time for Operation: &lt; 3 sec for 10k nodes</li>
+                        </ul>
+                    </section>
                 </section>
 
                <section>
-                   <h2>Problems</h2>
+                   <h2>Challenges w/ Tree Controls in AngularJS</h2>
                    <ul>
-                    <li>More than 10 level deep</li>
-                    <li>transculsion</li>
-                    <li>Large number of nodes</li>
-                    <li>Small memory foot print (mobile)</li>
+                        <li>Trees more than 10 levels deep</li>
+                        <li>Allow user to specify thier own template for nodes (transculsion)</li>
+                        <li>Large number of nodes</li>
+                        <li>Communication (Isolate Scope)</li>
                     </ul>
+               </section>
+
+               <section>
+                   <section>
+                       <h2>Current State of AngularJS Tree Directives</h2>
+                       <p>What tree directives currently exist</p>
+                       <p>How did they fail to meet our needs</p>
+                   </section>
+                   <section>
+                       <h2>Current Tree Controls</h2>
+                       <ul>
+                            <li>
+                                <a href="https://github.com/angular-ui-tree/angular-ui-tree">Angular UI Tree</a>
+                            </li>
+                           <li>
+                               <a href="https://github.com/marmelab/ng-tree">ng-tree</a>
+                           </li>
+                           <li>
+                               <a href="https://github.com/wix/angular-tree-control">Angular Tree Control</a>
+                           </li>
+                           <li>
+                               <a href="https://github.com/nickperkinslondon/angular-bootstrap-nav-tree">Angular BootStrap Nav Tree</a>
+                           </li>
+                       </ul>
+                   </section>
+                   <section>
+                        <h2>Problems With Existing Controlls</h2>
+                        <ul>
+                            <li>Handling depth &lt; 10</li>
+                            <li>Performance</li>
+                            <li>User Supplied Templates</li>
+                            <li>Code Structure</li>
+                        </ul>
+                   </section>
                </section>
 
               <!--Stephen-->
@@ -77,6 +144,7 @@
                </section>
 
              <!--Stephen-->
+             <!--We should consider borrowing the pic from and linking to http://www.jvandemo.com/the-nitty-gritty-of-compile-and-link-functions-inside-angularjs-directives/-->
               <section>
                    <h2>Compile, pre-link, post link</h2>
                    <p>How do these actually work</p>
@@ -106,6 +174,12 @@
                    <p>The display list</p>
                    <p>Sorting</p>
                </section>
+
+               <!--??????-->
+                <section>
+                    <h2>Communication</h2>
+                    <p>Callforward</p>
+                </section>
 
               <!--Troy-->
                <section>
