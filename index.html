@@ -191,23 +191,24 @@
                 <h2>Example of Digesting</h2>
                        <pre>
                            <code class="javascript" data-trim contenteditable>
-//let's assume that scope was dependency injected as the $rootScope var scope = $rootScope;
-scope.name = 'misko';
-scope.counter = 0;
-expect(scope.counter).toEqual(0);
-scope.$watch('name', function(newValue, oldValue) {
-scope.counter = scope.counter + 1;
-});
-expect(scope.counter).toEqual(0);
-scope.$digest();
-//the listener is always called during the first $digest loop after it was registered
-expect(scope.counter).toEqual(1);
-scope.$digest();
-//but now it will not be called unless the value changes
-expect(scope.counter).toEqual(1);
-scope.name = 'adam';
-scope.$digest();
-expect(scope.counter).toEqual(2);
+                               //let's assume that scope was dependency injected as the $rootScope var scope =
+                               $rootScope;
+                               scope.name = 'misko';
+                               scope.counter = 0;
+                               expect(scope.counter).toEqual(0);
+                               scope.$watch('name', function(newValue, oldValue) {
+                               scope.counter = scope.counter + 1;
+                               });
+                               expect(scope.counter).toEqual(0);
+                               scope.$digest();
+                               //the listener is always called during the first $digest loop after it was registered
+                               expect(scope.counter).toEqual(1);
+                               scope.$digest();
+                               //but now it will not be called unless the value changes
+                               expect(scope.counter).toEqual(1);
+                               scope.name = 'adam';
+                               scope.$digest();
+                               expect(scope.counter).toEqual(2);
                            </code>
                        </pre>
             </section>
@@ -280,11 +281,13 @@ expect(scope.counter).toEqual(2);
                             It is safe to do template transformation on the element and child elements only.
                         </li>
                         <li>
-                            `tAttrs` - template attributes - Normalized list of attributes declared on this element shared
+                            `tAttrs` - template attributes - Normalized list of attributes declared on this element
+                            shared
                             between all directive compile functions.
                         </li>
                         <li>
-                            `transclude` -  [*DEPRECATED*!] A transclude linking function: `function(scope, cloneLinkingFn)`
+                            `transclude` - [*DEPRECATED*!] A transclude linking function: `function(scope,
+                            cloneLinkingFn)`
                         </li>
                     </ul>
                     **Note:** The template instance and the link instance may be different objects if the template has
@@ -301,8 +304,8 @@ expect(scope.counter).toEqual(2);
                     `templateUrl` declaration or manual compilation inside the compile function.
 
                     **Note:** The `transclude` function that is passed to the compile function is deprecated, as it
-                      e.g. does not know about the right outer scope. Please use the transclude function that is passed
-                      to the link function instead.
+                    e.g. does not know about the right outer scope. Please use the transclude function that is passed
+                    to the link function instead.
 
                     A compile function can have a return value which can be either a function or an object.
                     <ul>
@@ -311,7 +314,8 @@ expect(scope.counter).toEqual(2);
                             `link` property of the config object when the compile function is empty.
                         </li>
                         <li>
-                            returning an object with function(s) registered via `pre` and `post` properties - allows you to
+                            returning an object with function(s) registered via `pre` and `post` properties - allows you
+                            to
                             control when a linking function should be called during the linking phase. See info about
                             pre-linking and post-linking functions below.
                         </li>
@@ -363,7 +367,8 @@ expect(scope.counter).toEqual(2);
                             already been linked.
                         </li>
                         <li>
-                            `iAttrs` - instance attributes - Normalized list of attributes declared on this element shared
+                            `iAttrs` - instance attributes - Normalized list of attributes declared on this element
+                            shared
                             between all directive linking functions.
                         </li>
                         <li>
@@ -461,7 +466,8 @@ expect(scope.counter).toEqual(2);
                     Transclusion
 
                     Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
-                    copying them to another part of the DOM, while maintaining their connection to the original AngularJS
+                    copying them to another part of the DOM, while maintaining their connection to the original
+                    AngularJS
                     scope from where they were taken.
 
                     Transclusion is used (often with ngTransclude) to insert the
@@ -473,7 +479,8 @@ expect(scope.counter).toEqual(2);
                     This makes it possible for the widget to have private state for its template, while the transcluded
                     content has access to its originating scope.
 
-                    **Note:** When testing an element transclude directive you must not place the directive at the root of the
+                    **Note:** When testing an element transclude directive you must not place the directive at the root
+                    of the
                     DOM fragment that is being compiled.
                 </aside>
 
@@ -490,7 +497,6 @@ expect(scope.counter).toEqual(2);
                 <p class="fragment">
                     Open/Closed Principle
                 </p>
-
             </section>
         </section>
 
