@@ -233,34 +233,265 @@ expect(scope.counter).toEqual(2);
         </section>
 
         <!--Stephen-->
-        <!--We should consider borrowing the pic from and linking to http://www.jvandemo.com/the-nitty-gritty-of-compile-and-link-functions-inside-angularjs-directives/-->
+        <!--We should consider borrowing the pic from and linking to
+        http://www.jvandemo.com/the-nitty-gritty-of-compile-and-link-functions-inside-angularjs-directives/-->
         <section>
-            <h2>Compile, pre-link, post link</h2>
+            <section>
+                <h2>Compile, pre-link, post link</h2>
 
-            <p class="fragment">
-                How do these actually work???
-            </p>
+                <p class="fragment">
+                    How do these actually work???
+                </p>
 
-            <p class="fragment">
-                Black magic voodoo and magnets???
-            </p>
+                <p class="fragment">
+                    Black magic voodoo and magnets???
+                </p>
 
-            <p class="fragment">
-                Belief Google has your best interests at heart???
-            </p>
+                <p class="fragment">
+                    Believing that Google has your best interests at heart???
+                </p>
+            </section>
+            <section>
+                <h2>Compile</h2>
 
+                <p class="fragment">
+                    makeTemplate(String || DOM)
+                </p>
 
+                <p class="fragment">
+                    Transformation happen here
+                </p>
+
+                <p class="fragment">
+                    This is not often used
+                </p>
+
+                <aside class="notes">
+                    `compile`
+
+                    function compile(tElement, tAttrs, transclude) { ... }
+
+                    The compile function deals with transforming the template DOM.
+                    Since most directives do not do template transformation, it is not used often.
+                    The compile function takes the following arguments:
+                    <ul>
+                        <li>
+                            `tElement` - template element - The element where the directive has been declared.
+                            It is safe to do template transformation on the element and child elements only.
+                        </li>
+                        <li>
+                            `tAttrs` - template attributes - Normalized list of attributes declared on this element shared
+                            between all directive compile functions.
+                        </li>
+                        <li>
+                            `transclude` -  [*DEPRECATED*!] A transclude linking function: `function(scope, cloneLinkingFn)`
+                        </li>
+                    </ul>
+                    **Note:** The template instance and the link instance may be different objects if the template has
+                    been cloned. For this reason it is **not** safe to do anything other than DOM transformations that
+                    apply to all cloned DOM nodes within the compile function. Specifically, DOM listener registration
+                    should be done in a linking function rather than in a compile function.
+
+                    **Note:** The compile function cannot handle directives that recursively use themselves in their
+                    own templates or compile functions. Compiling these directives results in an infinite loop and a
+                    stack overflow errors.
+
+                    This can be avoided by manually using $compile in the postLink function to imperatively compile
+                    a directive's template instead of relying on automatic template compilation via `template` or
+                    `templateUrl` declaration or manual compilation inside the compile function.
+
+                    **Note:** The `transclude` function that is passed to the compile function is deprecated, as it
+                      e.g. does not know about the right outer scope. Please use the transclude function that is passed
+                      to the link function instead.
+
+                    A compile function can have a return value which can be either a function or an object.
+                    <ul>
+                        <li>
+                            returning a (post-link) function - is equivalent to registering the linking function via the
+                            `link` property of the config object when the compile function is empty.
+                        </li>
+                        <li>
+                            returning an object with function(s) registered via `pre` and `post` properties - allows you to
+                            control when a linking function should be called during the linking phase. See info about
+                            pre-linking and post-linking functions below.
+                        </li>
+                    </ul>
+                </aside>
+            </section>
+            <section>
+                <h2>Link</h2>
+
+                <p class="fragment">
+                    Wire up the template to data... Registrar of watches
+                </p>
+
+                <p class="fragment">
+                    Happens after cloning
+                </p>
+
+                <p class="fragment">
+                    Keeper of the directive logic
+                </p>
+
+                <p class="fragment">
+                    Comes in 'pre' and 'post' flavors
+                </p>
+
+                <p class="fragment">
+                    DOM transforms only in 'post'
+                </p>
+
+                <aside class="notes">
+                    `link`
+
+                    This property is used only if the `compile` property is not defined.
+
+                    function link(scope, iElement, iAttrs, controller, transcludeFn) { ... }
+
+                    The link function is responsible for registering DOM listeners as well as updating the DOM. It is
+                    executed after the template has been cloned. This is where most of the directive logic will be
+                    put.
+
+                    <ul>
+                        <li>
+                            `scope` - {@link ng.$rootScope.Scope Scope} - The scope to be used by the
+                            directive for registering {@link ng.$rootScope.Scope#$watch watches}.
+                        </li>
+                        <li>
+                            `iElement` - instance element - The element where the directive is to be used. It is safe to
+                            manipulate the children of the element only in `postLink` function since the children have
+                            already been linked.
+                        </li>
+                        <li>
+                            `iAttrs` - instance attributes - Normalized list of attributes declared on this element shared
+                            between all directive linking functions.
+                        </li>
+                        <li>
+                            `controller` - the directive's required controller instance(s) - Instances are shared
+                            among all directives, which allows the directives to use the controllers as a communication
+                            channel. The exact value depends on the directive's `require` property:
+                            <ul>
+                                <li>
+                                    `string`: the controller instance
+                                </li>
+                                <li>
+                                    `array`: array of controller instances
+                                </li>
+                                <li>
+                                    no controller(s) required: `undefined`
+                                </li>
+                            </ul>
+                            If a required controller cannot be found, and it is optional, the instance is `null`,
+                            otherwise the {@link error:$compile:ctreq Missing Required Controller} error is thrown.
+                        </li>
+                        <li>
+                            `transcludeFn` - A transclude linking function pre-bound to the correct transclusion scope.
+                            This is the same as the `$transclude`
+                            parameter of directive controllers, see there for details.
+                            `function([scope], cloneLinkingFn, futureParentElement)`.
+                        </li>
+                    </ul>
+
+                    Pre-linking function
+
+                    Executed before the child elements are linked. Not safe to do DOM transformation since the
+                    compiler linking function will fail to locate the correct elements for linking.
+
+                    Post-linking function
+
+                    Executed after the child elements are linked.
+
+                    Note that child elements that contain `templateUrl` directives will not have been compiled
+                    and linked since they are waiting for their template to load asynchronously and their own
+                    compilation and linking has been suspended until that occurs.
+
+                    It is safe to do DOM transformation in the post-linking function on elements that are not waiting
+                    for their async templates to be resolved.
+                </aside>
+            </section>
+            <section>
+                <h2>High Level</h2>
+                <image data-src="images/cycle.png" style="background: white"></image>
+            </section>
         </section>
 
         <!--Stephen-->
         <section>
-            <h2>Transculsion</h2>
+            <section>
+                <h2>
+                    Transculsion
+                </h2>
 
-            <p>What is it?</p>
+                <p class="fragment">
+                    What is it?
+                </p>
 
-            <p>Why do you want it</p>
+                <p class="fragment">
+                    Is it a made up word?
+                </p>
 
-            <p>How to get it</p>
+                <p class="fragment">
+                    Isn't this what Thoreau and Emerson where into?
+                    <image data-src="images/thoreau.jpg"></image>
+                </p>
+            </section>
+            <section>
+                <h2>
+                    Abstract Idea
+                </h2>
+
+                <p class="fragment">
+                    Coping a collection of DOM elements
+                </p>
+
+                <p class="fragment">
+                    Putting them into a different part of the DOM<br>
+                    (potentially multiple times)
+                </p>
+
+                <p class="fragment">
+                    The copies maintain their link to the parent scope
+                </p>
+
+                <p class="fragment">
+                    Digest cycles maybe triggered for this...
+                </p>
+
+                <aside class="notes">
+                    Transclusion
+
+                    Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
+                    copying them to another part of the DOM, while maintaining their connection to the original AngularJS
+                    scope from where they were taken.
+
+                    Transclusion is used (often with ngTransclude) to insert the
+                    original contents of a directive's element into a specified place in the template of the directive.
+                    The benefit of transclusion, over simply moving the DOM elements manually, is that the transcluded
+                    content has access to the properties on the scope from which it was taken, even if the directive
+                    has isolated scope.
+
+                    This makes it possible for the widget to have private state for its template, while the transcluded
+                    content has access to its originating scope.
+
+                    **Note:** When testing an element transclude directive you must not place the directive at the root of the
+                    DOM fragment that is being compiled.
+                </aside>
+
+            </section>
+            <section>
+                <h2>
+                    Practical Idea
+                </h2>
+
+                <p class="fragment">
+                    Allowing a user to pass in a template to be used in your directive...
+                </p>
+
+                <p class="fragment">
+                    Open/Closed Principle
+                </p>
+
+            </section>
         </section>
 
         <!--Troy-->
