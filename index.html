@@ -47,8 +47,8 @@
             <h3>Building a high performance tree control for AngularJS</h3>
 
             <p>
-                <small>Created by <a href="">Troy Dey</a></small>
-                <small>And <a href="">Stephen Erstad</a></small>
+                <small>Created by Troy Dey</a></small>
+                <small>And Stephen Erstad</a></small>
             </p>
         </section>
 
@@ -105,43 +105,6 @@
                 <li>Large number of nodes</li>
                 <li>Communication (Isolate Scope)</li>
             </ul>
-        </section>
-
-        <section>
-            <section>
-                <h2>Current State of AngularJS Tree Directives</h2>
-
-                <p>What tree directives currently exist</p>
-
-                <p>How did they fail to meet our needs</p>
-            </section>
-            <section>
-                <h2>Current Tree Controls</h2>
-                <ul>
-                    <li>
-                        <a href="https://github.com/angular-ui-tree/angular-ui-tree">Angular UI Tree</a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/marmelab/ng-tree">ng-tree</a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/wix/angular-tree-control">Angular Tree Control</a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/nickperkinslondon/angular-bootstrap-nav-tree">Angular BootStrap Nav
-                            Tree</a>
-                    </li>
-                </ul>
-            </section>
-            <section>
-                <h2>Problems With Existing Controlls</h2>
-                <ul>
-                    <li>Handling depth &lt; 10</li>
-                    <li>Performance</li>
-                    <li>User Supplied Templates</li>
-                    <li>Code Structure</li>
-                </ul>
-            </section>
         </section>
 
         <!--Stephen-->
@@ -505,65 +468,81 @@
             <section>
                 <h2>Achieving Peformance</h2>
 
-                <p>Performance Indicators</p>
+                <p class="fragment">Performance Indicators</p>
 
-                <p>Avoiding the Digest Cycle</p>
+                <p class="fragment">Avoiding the Digest Cycle</p>
 
-                <p>Streamlining the DOM</p>
+                <p class="fragment">Streamlining the DOM</p>
 
-                <p>Other stuff (track by, topsort, treejs, display list, ect.)</p>
+                <p class="fragment">ng-repeate track by</p>
             </section>
             <section>
                 <h2>Performance Indicators</h2>
-                <ul>
-                    <li>Time to initial render</li>
-                    <li>Time to perform operations</li>
-                    <li>Total memory consumption</li>
-                    <li>Avoid excessive reflows</li>
-                    <li>Avoid excessive gc</li>
-                </ul>
+                <p class="fragment">Time to initial render</p>
+                <p class="fragment">Time to perform operations</p>
+                <p class="fragment">Total memory consumption</p>
+                <p class="fragment">Avoid excessive reflows</p>
+                <p class="fragment">Avoid excessive gc</p>
+                <aside class="notes">
+                    How do we discover these indicators.
+                    performance.timing returns a object with a number of timing events.
+                    Use Chrome timeline to find GC thrashing, memory leeks, reflows (chrome marks them)
+                </aside>
             </section>
             <section>
                 <h2>Avoiding the Digest Cycle</h2>
-                <ul>
-                    <li>Digest cycle is expensive</li>
-                    <li>Causes lots of DOM Manpulation</li>
-                    <li>When using recursive includes it runs every time it encounters another include</li>
-                    <li>Limit to ten levels deep</li>
-                </ul>
+                <p class="fragment">Digest cycle is expensive</p>
+                <p class="fragment">Causes lots of DOM Manpulation</p>
+                <p class="fragment">When using recursive includes it runs every time it encounters another include</p>
+                <p class="fragment">Limit to ten levels deep</p>
+                <aside class="notes">
+                    Digest cycle has to run all the watches on the page which could be many for a large tree in
+                    addition to all the other things on the page and these watchers could themselves cause DOM changes which
+                    trigger additional digest cycles.
+                </aside>
             </section>
             <section>
                 <h2>Streamlining the DOM</h2>
 
-                <p>Convert tree structure to flat list</p>
+                <p class="fragment">Convert tree structure to flat list</p>
                 <ul>
-                    <li>Reduces the number of DOM nodes</li>
-                    <li>Reduces teh complexity of the DOM tree</li>
-                    <li>Uses autogenerated styles to indent the nodes the proper amount</li>
-                    <li>Use one ng-repeat with track by ID</li>
+                    <li class="fragment">Reduces the number of DOM nodes</li>
+                    <li class="fragment">Reduces the complexity of the DOM tree</li>
+                    <li class="fragment">Uses autogenerated styles to indent the nodes the proper amount</li>
+                    <li class="fragment">Use one ng-repeat with track by ID</li>
+                    <aside class="notes">
+
+                    </aside>
                 </ul>
             </section>
             <section>
                 <h2>The Display List</h2>
 
-                <p>Use actual tree data structure to perform tree operations</p>
-
-                <p>Use topological sort to create the display lsit</p>
-
-                <p>Simple approach of regenerating the display list on most changes</p>
-
-                <p>Top sort is heavily used and therefore needs to be optimised significantly</p>
+                <p class="fragment">Use an actual tree data structure to perform tree operations</p>
+                <p class="fragment">Use topological sort to create the display lsit</p>
+                <p class="fragment">Simple approach of regenerating the display list on most changes</p>
+                <p class="fragment">Top sort is heavily used and therefore needs to be optimised significantly</p>
             </section>
         </section>
 
-        <!--??????-->
         <section>
-            <h2>Communication</h2>
+            <section>
+                <h2>Communication</h2>
 
-            <p>Callforward</p>
+                <p class="fragment">How does the consumer communicate with the tree?</p>
+                <p class="fragment">How do you avoid broadcasts everywhere?</p>
+                <p class="fragment">How do you maintian an isolate scope for you directive?</p>
+            </section>
+            <section>
+                <h2>Promise Magic</h2>
+
+                <p class="fragment">Provide endpoints for the consumer to pass a callback function that returns a promise</p>
+                <p class="fragment">The consumer performs the opreations it needs and resolves the promise with the result strucutred as specified by the tree</p>
+                <p class="fragment">The tree waits for the promise to resolve then performs the operations it needs to in order to update its state</p>
+                <p class="fragment">This allows for very specific and controlled interaction points with the directive</p>
+            </section>
         </section>
 
-        <!--Troy-->
         <section>
             <h2>Unit Testing Setup/framework gulp</h2>
         </section>
