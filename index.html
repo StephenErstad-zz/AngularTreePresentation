@@ -135,6 +135,9 @@
                 <p class="fragment">
                     Or maybe we don't and our sites run like Windows Vista?
                 </p>
+            </section>
+            <section>
+                <h2>Overview</h2>
 
                 <p class="fragment">
                     Processes Watchers
@@ -166,25 +169,26 @@
             <section>
                 <h2>Example of Digesting</h2>
                        <pre>
-                           <code class="javascript" data-trim contenteditable>
-                               //let's assume that scope was dependency injected as the $rootScope var scope =
-                               $rootScope;
-                               scope.name = 'misko';
-                               scope.counter = 0;
-                               expect(scope.counter).toEqual(0);
-                               scope.$watch('name', function(newValue, oldValue) {
-                               scope.counter = scope.counter + 1;
-                               });
-                               expect(scope.counter).toEqual(0);
-                               scope.$digest();
-                               //the listener is always called during the first $digest loop after it was registered
-                               expect(scope.counter).toEqual(1);
-                               scope.$digest();
-                               //but now it will not be called unless the value changes
-                               expect(scope.counter).toEqual(1);
-                               scope.name = 'adam';
-                               scope.$digest();
-                               expect(scope.counter).toEqual(2);
+                           <code data-trim contenteditable>
+//let's assume that scope was dependency injected as the $rootScope
+var scope = $rootScope;
+scope.name = 'misko';
+scope.counter = 0;
+expect(scope.counter).toEqual(0);
+scope.$watch('name', function(newValue, oldValue) {
+scope.counter = scope.counter + 1;
+});
+expect(scope.counter).toEqual(0);
+scope.$digest();
+//the listener is always called during the first $digest loop
+//after it was registered
+expect(scope.counter).toEqual(1);
+scope.$digest();
+//but now it will not be called unless the value changes
+expect(scope.counter).toEqual(1);
+scope.name = 'adam';
+scope.$digest();
+expect(scope.counter).toEqual(2);
                            </code>
                        </pre>
             </section>
@@ -210,8 +214,6 @@
         </section>
 
         <!--Stephen-->
-        <!--We should consider borrowing the pic from and linking to
-        http://www.jvandemo.com/the-nitty-gritty-of-compile-and-link-functions-inside-angularjs-directives/-->
         <section>
             <section>
                 <h2>Compile, pre-link, post link</h2>
@@ -242,6 +244,29 @@
                 <p class="fragment">
                     This is not often used
                 </p>
+            </section>
+            <section>
+                <h2>Example of Compile</h2>
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+//`tElement` The element where the directive has been declared.
+//`tAttrs` Normalized list of attributes declared on this element
+// shared between all directive compile functions.
+//`transclude` [*DEPRECATED*!]
+// A transclude linking function: `function(scope, cloneLinkingFn)`
+compile: function compile(tElement, tAttrs, transclude) {
+  return {
+    pre: function preLink(scope, iElement, iAttrs, controller) {
+                        ... },
+    post: function postLink(scope, iElement, iAttrs, controller) {
+                        ... }
+  }
+  // or
+  // return function postLink( ... ) { ... }
+}
+                    </code>
+                </pre>
+
 
                 <aside class="notes">
                     `compile`
@@ -320,6 +345,28 @@
                 <p class="fragment">
                     DOM transforms only in 'post'
                 </p>
+            </section>
+            <section>
+                <h2>Example of Link Functions</h2>
+
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+//Defined by the compile function
+// OR off of the directive definition object like the compile
+link: {
+ pre: function preLink(scope,
+                        iElement,
+                        iAttrs,
+                        controller,
+                        transclude) {
+                        ... },
+ post: function postLink(...) {
+                        ... }
+}
+//or
+//link: function postLink( ... ) { ... }
+                    </code>
+                </pre>
 
                 <aside class="notes">
                     `link`
@@ -334,8 +381,8 @@
 
                     <ul>
                         <li>
-                            `scope` - {@link ng.$rootScope.Scope Scope} - The scope to be used by the
-                            directive for registering {@link ng.$rootScope.Scope#$watch watches}.
+                            `scope` - Scope - The scope to be used by the
+                            directive for registering watches.
                         </li>
                         <li>
                             `iElement` - instance element - The element where the directive is to be used. It is safe to
@@ -363,7 +410,7 @@
                                 </li>
                             </ul>
                             If a required controller cannot be found, and it is optional, the instance is `null`,
-                            otherwise the {@link error:$compile:ctreq Missing Required Controller} error is thrown.
+                            otherwise the Missing Required Controller error is thrown.
                         </li>
                         <li>
                             `transcludeFn` - A transclude linking function pre-bound to the correct transclusion scope.
@@ -392,15 +439,26 @@
             </section>
             <section>
                 <h2>High Level</h2>
-                <image data-src="images/cycle.png" style="background: white"></image>
+                <image data-src="images/No-transclusion.svg"></image>
+                <p class="fragment">
+                    But this is Ng, so it isn't quite that simple...
+                </p>
             </section>
+            <section>
+                <h2>High Level (with transclusion)</h2>
+                <image data-src="images/Transclusion.svg"></image>
+                <aside class="notes">
+                    http://www.jvandemo.com/the-nitty-gritty-of-compile-and-link-functions-inside-angularjs-directives/
+                </aside>
+            </section>
+
         </section>
 
         <!--Stephen-->
         <section>
             <section>
                 <h2>
-                    Transculsion
+                    Transclusion
                 </h2>
 
                 <p class="fragment">
@@ -418,7 +476,7 @@
             </section>
             <section>
                 <h2>
-                    Abstract Idea
+                    Overview
                 </h2>
 
                 <p class="fragment">
@@ -437,6 +495,45 @@
                 <p class="fragment">
                     Digest cycles maybe triggered for this...
                 </p>
+            </section>
+            <section>
+                <h2>
+                    Practical Idea
+                </h2>
+
+                <p class="fragment">
+                    Allowing a user to pass in a template to be used in your directive...
+                </p>
+
+                <p class="fragment">
+                    Open/Closed Principle
+                </p>
+            </section>
+            <section>
+                <h2>Template Example of Transclusion</h2>
+                <pre>
+                    <code data-trim contenteditable>
+<div>
+    <h2>This is the template of the directive</h2>
+    <ng-transclude></ng-transclude>
+</div>
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Code Example of Transclusion</h2>
+                <pre>
+                    <code>
+... link: function (scope, element, attrs, ctrl, transclude) {
+                        transclude(scope, function (clone) {
+                            clone.after(element);
+                        });
+                        transclude(scope, function (clone) {
+                            clone.after(element);
+                        });
+            }
+                    </code>
+                </pre>
 
                 <aside class="notes">
                     Transclusion
@@ -456,23 +553,8 @@
                     content has access to its originating scope.
 
                     **Note:** When testing an element transclude directive you must not place the directive at the root
-                    of the
-                    DOM fragment that is being compiled.
+                    of the DOM fragment that is being compiled.
                 </aside>
-
-            </section>
-            <section>
-                <h2>
-                    Practical Idea
-                </h2>
-
-                <p class="fragment">
-                    Allowing a user to pass in a template to be used in your directive...
-                </p>
-
-                <p class="fragment">
-                    Open/Closed Principle
-                </p>
             </section>
         </section>
 
@@ -487,7 +569,7 @@
 
                 <p class="fragment">Streamlining the DOM</p>
 
-                <p class="fragment">ng-repeate track by</p>
+                <p class="fragment">ng-repeat track by</p>
             </section>
             <section>
                 <h2>Performance Indicators</h2>
@@ -505,7 +587,7 @@
             <section>
                 <h2>Avoiding the Digest Cycle</h2>
                 <p class="fragment">Digest cycle is expensive</p>
-                <p class="fragment">Causes lots of DOM Manpulation</p>
+                <p class="fragment">Causes lots of DOM Manipulation</p>
                 <p class="fragment">When using recursive includes it runs every time it encounters another include</p>
                 <p class="fragment">Limit to ten levels deep</p>
                 <aside class="notes">
