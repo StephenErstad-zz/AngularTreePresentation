@@ -495,6 +495,40 @@ link: {
                 <p class="fragment">
                     Digest cycles maybe triggered for this...
                 </p>
+
+                <pre class="fragment">
+                    <code>
+//Directive definition
+...
+tranclude: true,
+...
+//OR
+...
+transclude: 'element',
+...
+                    </code>
+                </pre>
+
+                <aside class="notes">
+                    Transclusion
+
+                    Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
+                    copying them to another part of the DOM, while maintaining their connection to the original
+                    AngularJS
+                    scope from where they were taken.
+
+                    Transclusion is used (often with ngTransclude) to insert the
+                    original contents of a directive's element into a specified place in the template of the directive.
+                    The benefit of transclusion, over simply moving the DOM elements manually, is that the transcluded
+                    content has access to the properties on the scope from which it was taken, even if the directive
+                    has isolated scope.
+
+                    This makes it possible for the widget to have private state for its template, while the transcluded
+                    content has access to its originating scope.
+
+                    **Note:** When testing an element transclude directive you must not place the directive at the root
+                    of the DOM fragment that is being compiled.
+                </aside>
             </section>
             <section>
                 <h2>
@@ -534,27 +568,17 @@ link: {
             }
                     </code>
                 </pre>
-
-                <aside class="notes">
-                    Transclusion
-
-                    Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
-                    copying them to another part of the DOM, while maintaining their connection to the original
-                    AngularJS
-                    scope from where they were taken.
-
-                    Transclusion is used (often with ngTransclude) to insert the
-                    original contents of a directive's element into a specified place in the template of the directive.
-                    The benefit of transclusion, over simply moving the DOM elements manually, is that the transcluded
-                    content has access to the properties on the scope from which it was taken, even if the directive
-                    has isolated scope.
-
-                    This makes it possible for the widget to have private state for its template, while the transcluded
-                    content has access to its originating scope.
-
-                    **Note:** When testing an element transclude directive you must not place the directive at the root
-                    of the DOM fragment that is being compiled.
-                </aside>
+            </section>
+            <section>
+                <h2>
+                    Pitfalls
+                </h2>
+                <p>
+                    ngTransclude and the digest cycle...
+                </p>
+                <p>
+                    Remember you are in the deepest bowels of Ng
+                </p>
             </section>
         </section>
 
