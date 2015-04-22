@@ -150,16 +150,21 @@
 
                 <aside class="notes">
                     Processes all of the watchers of the current scope and its children.
+                    <br><br>
                     Because a watcher's listener can change the model, the `$digest()` keeps calling the watchers until
                     no more listeners are firing.
+                    <br><br>
                     This means that it is possible to get into an infinite loop.
                     This function will throw `'Maximum iteration limit exceeded.'` if the number of iterations exceeds
                     10.
+                    <br><br>
                     Usually, you don't call `$digest()` directly in controllers or in directives.
                     Instead, you should call $apply() (typically from within a directive), which will force a
                     `$digest()`.
+                    <br><br>
                     If you want to be notified whenever `$digest()` is called, you can register a `watchExpression`
                     function with $watch()} with no `listener`.
+                    <br><br>
                     In unit tests, you may need to call `$digest()` to simulate the scope life cycle.
                 </aside>
             </section>
@@ -254,7 +259,7 @@ expect(scope.counter).toEqual(2);
 // shared between all directive compile functions.
 //`transclude` [*DEPRECATED*!]
 // A transclude linking function: `function(scope, cloneLinkingFn)`
-compile: function compile(tElement, tAttrs, transclude) {
+compile: function compile(tElement, tAttrs, transcludeFn) {
   return {
     pre: function preLink(scope, iElement, iAttrs, controller) {
                         ... },
@@ -270,9 +275,9 @@ compile: function compile(tElement, tAttrs, transclude) {
 
                 <aside class="notes">
                     `compile`
-
+                    <br><br>
                     function compile(tElement, tAttrs, transclude) { ... }
-
+                    <br><br>
                     The compile function deals with transforming the template DOM.
                     Since most directives do not do template transformation, it is not used often.
                     The compile function takes the following arguments:
@@ -287,7 +292,7 @@ compile: function compile(tElement, tAttrs, transclude) {
                             between all directive compile functions.
                         </li>
                         <li>
-                            `transclude` - [*DEPRECATED*!] A transclude linking function: `function(scope,
+                            `transcludeFn` - [*DEPRECATED*!] A transclude linking function: `function(scope,
                             cloneLinkingFn)`
                         </li>
                     </ul>
@@ -295,19 +300,19 @@ compile: function compile(tElement, tAttrs, transclude) {
                     been cloned. For this reason it is **not** safe to do anything other than DOM transformations that
                     apply to all cloned DOM nodes within the compile function. Specifically, DOM listener registration
                     should be done in a linking function rather than in a compile function.
-
+                    <br><br>
                     **Note:** The compile function cannot handle directives that recursively use themselves in their
                     own templates or compile functions. Compiling these directives results in an infinite loop and a
                     stack overflow errors.
-
+                    <br><br>
                     This can be avoided by manually using $compile in the postLink function to imperatively compile
                     a directive's template instead of relying on automatic template compilation via `template` or
                     `templateUrl` declaration or manual compilation inside the compile function.
-
+                    <br><br>
                     **Note:** The `transclude` function that is passed to the compile function is deprecated, as it
                     e.g. does not know about the right outer scope. Please use the transclude function that is passed
                     to the link function instead.
-
+                    <br><br>
                     A compile function can have a return value which can be either a function or an object.
                     <ul>
                         <li>
@@ -358,7 +363,7 @@ link: {
                         iElement,
                         iAttrs,
                         controller,
-                        transclude) {
+                        transcludeFn) {
                         ... },
  post: function postLink(...) {
                         ... }
@@ -370,11 +375,11 @@ link: {
 
                 <aside class="notes">
                     `link`
-
+                    <br><br>
                     This property is used only if the `compile` property is not defined.
-
+                    <br><br>
                     function link(scope, iElement, iAttrs, controller, transcludeFn) { ... }
-
+                    <br><br>
                     The link function is responsible for registering DOM listeners as well as updating the DOM. It is
                     executed after the template has been cloned. This is where most of the directive logic will be
                     put.
@@ -391,8 +396,7 @@ link: {
                         </li>
                         <li>
                             `iAttrs` - instance attributes - Normalized list of attributes declared on this element
-                            shared
-                            between all directive linking functions.
+                            shared between all directive linking functions.
                         </li>
                         <li>
                             `controller` - the directive's required controller instance(s) - Instances are shared
@@ -421,18 +425,18 @@ link: {
                     </ul>
 
                     Pre-linking function
-
+                    <br><br>
                     Executed before the child elements are linked. Not safe to do DOM transformation since the
                     compiler linking function will fail to locate the correct elements for linking.
-
+                    <br><br>
                     Post-linking function
-
+                    <br><br>
                     Executed after the child elements are linked.
-
+                    <br><br>
                     Note that child elements that contain `templateUrl` directives will not have been compiled
                     and linked since they are waiting for their template to load asynchronously and their own
                     compilation and linking has been suspended until that occurs.
-
+                    <br><br>
                     It is safe to do DOM transformation in the post-linking function on elements that are not waiting
                     for their async templates to be resolved.
                 </aside>
@@ -511,21 +515,21 @@ transclude: 'element',
 
                 <aside class="notes">
                     Transclusion
-
+                    <br><br>
                     Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
                     copying them to another part of the DOM, while maintaining their connection to the original
                     AngularJS
                     scope from where they were taken.
-
+                    <br><br>
                     Transclusion is used (often with ngTransclude) to insert the
                     original contents of a directive's element into a specified place in the template of the directive.
                     The benefit of transclusion, over simply moving the DOM elements manually, is that the transcluded
                     content has access to the properties on the scope from which it was taken, even if the directive
                     has isolated scope.
-
+                    <br><br>
                     This makes it possible for the widget to have private state for its template, while the transcluded
                     content has access to its originating scope.
-
+                    <br><br>
                     **Note:** When testing an element transclude directive you must not place the directive at the root
                     of the DOM fragment that is being compiled.
                 </aside>
