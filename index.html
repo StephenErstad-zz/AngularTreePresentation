@@ -725,10 +725,77 @@ transclude: 'element',
             <section>
                 <h2>Promise Magic</h2>
 
-                <p class="fragment">Provide endpoints for the consumer to pass a callback function that returns a promise</p>
-                <p class="fragment">The consumer performs the operations it needs and resolves the promise with the result structured as specified by the tree</p>
-                <p class="fragment">The tree waits for the promise to resolve then performs the operations it needs to in order to update its state</p>
-                <p class="fragment">This allows for very specific and controlled interaction points with the directive</p>
+                <p class="fragment">Provide endpoints for the consumer to pass a callback function that returns a promise.</p>
+                <p class="fragment">The consumer performs the operations it needs and resolves the promise with the result structured as specified by the tree.</p>
+                <p class="fragment">The tree registers a callback with the promise to perform the opreations it needs when it is resolved/rejected.</p>
+                <p class="fragment">This allows for very specific and controlled interaction points with the directive.</p>
+                <p class="fragment">Disadvantage is that it adds more complexity to the setup of the directive.</p>
+                
+                <aside class="notes">
+                    Allows you to avoid prototypical inheritance and broadcast.
+                </aside>
+            </section>
+            <section>
+                <h2>Consumer Side Example</h2>
+                <p>Pass this function into the tree's on-edit attribute</p>
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+function editTag (node) {
+
+    var editResultDeferred = $q.defer();
+
+    if (!node) {
+        editResultDeferred.reject('node argument is required');
+    }
+    else {
+        var modalInstance = $modal.open({
+            templateUrl: 'views/templates/tag-modification-modal.tpl.html',
+            controller: 'TagModificationModalController as modTagVm',
+            resolve: {
+                tag: function () {
+                    var tagToModify = node.data;
+                    tagToModify._id = node.id;
+                    tagToModify.parentId = node.parentId;
+                    return tagToModify;
+                },
+                configuration: function () {
+                    return tagModificationModalConfigurations.editing;
+                }
+            }
+        });
+        modalInstance.result.then(function (modifiedTagData) {
+            alertService.addAlert('success', messageText.savedChangesAlert);
+            editResultDeferred.resolve(modifiedTagData);
+        }, function() {
+            editResultDeferred.reject();
+        });
+    }
+
+    return editResultDeferred.promise;
+}
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Tree Side Example</h2>
+                <p>Execute the on-edit function and register a callback to the returned promise</p>
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+function edit(node) {
+    var onEditPromise = treeVm.onEdit({node: node});
+
+    onEditPromise.then(function (editEvent) {
+        var nodeToEdit = treeVm.masterTree.find(displayListNode.path);
+        nodeToEdit.remove();
+        parent.append(treeService.createSubTree(editedNodeAndSiblings[0], defaultNode));        
+
+        treeVm.displayList = treeService.topologicalSort(treeVm.masterTree);
+
+        refreshSelectedState(displayListNode.id);
+    });
+}
+                    </code>
+                </pre>
             </section>
         </section>
 
