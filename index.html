@@ -60,7 +60,17 @@
                 alt-click: zoom in/out
             </aside>
         </section>
-
+        
+        <section>
+            <p class="fragment">It's....</p>
+            <img class="fragment" src="images/adventureTimeLogo.jpg"/>
+        </section>
+        
+        <section>
+            <p class="fragment">Disclaimer</p>
+            <img class="fragment" src="images/approximateknowledge.jpg"/>
+        </section>
+       
         <section>
             <section>
                 <h2>What's in a tree?</h2>
@@ -132,6 +142,8 @@
                 <p class="fragment">
                     Or maybe we don't and our sites run like Windows Vista?
                 </p>
+                
+                <img class="fragment" src="images/deeper.jpg"/>
             </section>
             <section>
                 <h2>Overview</h2>
@@ -585,30 +597,184 @@ transclude: 'element',
                 </p>
             </section>
         </section>
+        
+        <section>
+            <section>
+                <h2>Wielding Compile and Link</h2>
+                <p>To create a tree directive</p>
+                <pre>
+                    <code class="html" data-trim contenteditable>
+<rl-tree tree="ctrl.tree">
+    <div>My Node Template</div>
+</rl-tree>
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Tree Directive</h2>
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+(function () {
+    'use strict';
 
+    angular.module('rlTree.directives').directive('rlTree', rlTree);
+    
+    rlTree.$inject = ['$compile', 'treeService', 'treeTemplateFactory'];
+
+    function rlTree($compile, treeService, treeTemplateFactory) {
+        var directive = {
+            restrict: 'E',
+            scope: {
+              tree: '='  
+            },
+            link: link
+        };
+        return directive;
+        
+        //Post link function, let angular compile and link the directive
+        //once this is done we can safely modify the contents of our directive
+        //and start a new compile process
+        function link(scope, element, attrs, controllers) {
+            //get the user's html template
+            var customDisplayTemplate = element.html();
+            //get our containing template
+            treeTemplateFactory.setDisplayTemplate(customDisplayTemplate);
+            //clear the user's template
+            element.empty();
+            //Add the actual tree directive to the DOM
+            element.html('<tree-view tree="tree"></tree-view>');
+            //patch in the tree data
+            scope.tree = treeService.createTree(scope.tree);
+            //Compile the directive we added
+            $compile(element.contents())(scope);
+        }
+    }
+})();                
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Treeview</h2>
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+(function () {
+    'use strict';
+
+    treeView.$inject = ['$parse', '$compile', 'treeTemplateFactory'];
+    
+    angular.module('rlTree.directives').directive('treeView', treeView);
+    
+    function treeView($parse, $compile, treeTemplateFactory) {
+        return {
+            restrict: 'E',
+            require: ['?^treeChildView', 'treeView'],
+            scope: true,
+            compile: function($element, attr) {
+                var tree = $parse(attr.tree);
+                var treeClick = $parse(attr.treeClick);
+
+                return {
+                   //Use the pre link function because we need to create child
+                   //elements as we compile the directive(s)
+                    pre: function(scope, element, attrs) {
+                       //set the html of this directive to our template
+                        element.html(treeTemplateFactory.tree());
+                        //start a new compile cycle on this directive
+                        $compile(element.contents())(scope);
+                    },
+                    //Now all our children have html and have been wired up
+                    //so we can wire ourself up.
+                    post: function (scope, element, attrs, controllers) {
+                        var treeChildViewController = controllers[0];
+                        var treeViewController = controllers[1];
+
+                        treeViewController.setTree(tree(scope));
+                        treeViewController.setParentController(treeChildViewController);
+                        treeViewController.setTreeClick(treeClick);
+
+                        scope.tree = treeViewController.getRawTree();
+                    }
+                };
+            },
+            controller: 'treeViewController',
+            controllerAs: 'treeViewController'
+        };
+    }
+})();                        
+                    </code>
+                </pre>                
+            </section>
+            <section>
+                <h2>Tree Child View</h2>
+                <pre>
+                    <code class="javascript" data-trim contenteditable>
+(function () {
+    'use strict';
+    
+    treeChildView.$inject = ['$compile', 'treeTemplateFactory'];
+    
+    angular.module('rlTree.directives').directive('treeChildView', treeChildView);
+    
+    function treeChildView($compile, treeTemplateFactory) {
+    return {
+        restrict: 'E',
+        require: ['^treeView', 'treeChildView'],
+        scope: {
+            tree: '='
+        },
+        compile: function (element) {
+            return {
+               //Once again we need to use the prelink becuase we are generating our children
+               //as we go; which is how we avoid the digest cycle limitations
+                pre: function(scope, element) {
+                   //set the directive's html to our template
+                    element.html(treeTemplateFactory.treeChild());
+                    //Start a new compile cycle
+                    $compile(element.contents())(scope);
+                },
+                //wire up
+                post: function (scope, element, attrs, controllers) {
+                    var treeViewController = controllers[0];
+                    var treeChildViewController = controllers[1];
+
+                    treeChildViewController.setParentController(treeViewController);
+                }
+            };
+        },
+        controller: 'treeChildViewController',
+        controllerAs: 'treeChildViewController'
+    }
+}
+})();                        
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>But this is not how we ended up creating our tree.....</h2>
+            </section>
+        </section>
+        
         <!--Troy-->
         <section>
             <section>
                 <h2>Achieving Peformance</h2>
 
                 <p class="fragment">Performance Indicators</p>
-
                 <p class="fragment">Avoiding the Digest Cycle</p>
-
                 <p class="fragment">Streamlining the DOM</p>
-
                 <p class="fragment">ng-repeat track by</p>
             </section>
             <section>
                 <h2>Performance Indicators</h2>
+                
                 <p class="fragment">Time to initial render</p>
                 <p class="fragment">Time to perform operations</p>
                 <p class="fragment">Total memory consumption</p>
                 <p class="fragment">Avoid excessive reflows</p>
-                <p class="fragment">Avoid excessive gc</p>
+                <p class="fragment">Avoid excessive GC</p>
                 <aside class="notes">
                     How do we discover these indicators.
-                    performance.timing returns a object with a number of timing events.
+                    performance.timing returns an object with a number of timing events.
                     Use Chrome timeline to find GC thrashing, memory leeks, reflows (chrome marks them)
                 </aside>
             </section>
@@ -701,7 +867,7 @@ transclude: 'element',
                 <p class="fragment">Top sort is heavily used and therefore needs to be optimised significantly</p>
                 
                 <aside class="notes">
-                    Trees can be represented as matrices and adjacency lists but doing so for multiple tries of non uniform shape and size is difficult
+                    Trees can be represented as matrices and adjacency  lists but doing so for multiple tries of non uniform shape and size is difficult
                     Therefore we maintain an actual tree data structure rather than just using the display list for everything
                     Manipulating the tree in memory and regenerating the display list is much faster than having to write out the extra DOM nodes and deal with the extra digest cycles
                     The display list could be updated in a more targeted fashion to achieve better performance
@@ -711,6 +877,9 @@ transclude: 'element',
                     Our algorithm is a DPS because the top level parents have no incoming edges and each node only has a single parent, this simplifies the typical top sort algorithms
                     Show actual code here
                 </aside>
+            </section>
+            <section>
+                <h2>Let's look at some code!</h2>
             </section>
         </section>
 
@@ -727,13 +896,49 @@ transclude: 'element',
 
                 <p class="fragment">Provide endpoints for the consumer to pass a callback function that returns a promise.</p>
                 <p class="fragment">The consumer performs the operations it needs and resolves the promise with the result structured as specified by the tree.</p>
-                <p class="fragment">The tree registers a callback with the promise to perform the opreations it needs when it is resolved/rejected.</p>
+                <p class="fragment">The tree registers a callback with the promise to perform the operations it needs when it is resolved/rejected.</p>
                 <p class="fragment">This allows for very specific and controlled interaction points with the directive.</p>
                 <p class="fragment">Disadvantage is that it adds more complexity to the setup of the directive.</p>
                 
                 <aside class="notes">
                     Allows you to avoid prototypical inheritance and broadcast.
                 </aside>
+            </section>
+            <section>
+                <h2>Directive Declaration</h2>
+                <p>It turns out trees are complicated</p>
+                <pre>
+                    <code class="html" data-trim contenteditable>
+<rl-tree 
+        class="rl-tree" 
+        get-add-node-callback="testTree.registerAddNodeCallback()" 
+        tree="testTree.myTree" 
+        initial-state="expanded" 
+        indent-pixel-amount="20" 
+        get-children="testTree.getChildren(node)" 
+        on-error="testTree.errorHandler(errorMsg)" 
+        on-add="testTree.addNodeInline(node)"
+        on-edit="testTree.editNode(node)" 
+        on-move="testTree.moveNode(source, target)"
+        on-remove="testTree.removeNode(node)"
+        should-select-and-scroll-on-change="true"
+        should-deselect-on-outside-click="true">
+    <div ng-cloak ng-disabled="node.disabled" ng-click="treeVm.select(node)">
+        <span ng-if="node.isLoadingChildren" class="node-spinner"></span>
+        <a ng-if="!node.isLoadingChildren" href ng-disabled="node.disabled" ng-click="treeVm.collapse(node, $event)" class="node-handle"></a>
+        <span class="node-text">{{node.data.name}}</span>
+        <button ng-disabled="node.disabled" ng-click="treeVm.addChild(node, $event)" class="small">Add Child</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.addSibling(node, $event)" class="small">Add Sibling</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.edit(node, $event)" class="small">Edit</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.beginMove(node, $event)" class="small">Move</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.cancelMove($event)" class="small">Cancel Move</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.moveToChild(node, $event)" class="small">Move As Child</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.moveToSibling(node, $event)" class="small">Move As Sibling</button>
+        <button ng-disabled="node.disabled" ng-click="treeVm.remove(node, $event)" class="small">Remove</button>
+    </div>
+</rl-tree>                        
+                    </code>
+                </pre>
             </section>
             <section>
                 <h2>Consumer Side Example</h2>
@@ -801,6 +1006,10 @@ function edit(node) {
 
         <section>
             <h2>Unit Testing Setup/framework gulp</h2>
+            <p class="fragment">Unit testing is hard</p>
+            <p class="fragment">Unit testing javasciprt is really hard</p>
+            <p class="fragment">Unit testing AngularJS is really really hard</p>
+            <p class="fragment">Unit testing Directives impossible....?</p>
         </section>
         
         <section>
