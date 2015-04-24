@@ -221,7 +221,7 @@ expect(scope.counter).toEqual(2);
         <!--Stephen-->
         <section>
             <section>
-                <h2>Compile, pre-link, post link</h2>
+                <h2>Compile, transclusion, pre-link, post link</h2>
 
                 <p class="fragment">
                     How do these actually work???
@@ -328,135 +328,141 @@ compile: function compile(tElement, tAttrs, transcludeFn) {
                     </ul>
                 </aside>
             </section>
-
-            <!--Stephen-->
             <section>
-                <section>
-                    <h2>
-                        Transclusion
-                    </h2>
+                <h2>
+                    Transclusion
+                </h2>
 
-                    <p class="fragment">
-                        What is it?
-                    </p>
+                <p class="fragment">
+                    What is it?
+                </p>
 
-                    <p class="fragment">
-                        Is it a made up word?
-                    </p>
+                <p class="fragment">
+                    Is it a made up word?
+                </p>
 
-                    <p class="fragment">
-                        Isn't this what Thoreau and Emerson where into?
-                        <image data-src="images/thoreau.jpg"></image>
-                    </p>
-                </section>
-                <section>
-                    <h2>
-                        Overview
-                    </h2>
-
-                    <p class="fragment">
-                        Copying a collection of DOM elements
-                    </p>
-
-                    <p class="fragment">
-                        Putting them into a different part of the DOM<br>
-                        (potentially multiple times)
-                    </p>
-
-                    <p class="fragment">
-                        The copies maintain their link to the parent scope
-                    </p>
-
-                    <p class="fragment">
-                        Digest cycles maybe triggered for this...
-                    </p>
-
-                <pre class="fragment">
-                    <code>
-                        //Directive definition
-                        ...
-                        tranclude: true,
-                        ...
-                        //OR
-                        ...
-                        transclude: 'element',
-                        ...
-                    </code>
-                </pre>
-
-                    <aside class="notes">
-                        Transclusion
-                        <br><br>
-                        Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
-                        copying them to another part of the DOM, while maintaining their connection to the original
-                        AngularJS
-                        scope from where they were taken.
-                        <br><br>
-                        Transclusion is used (often with ngTransclude) to insert the
-                        original contents of a directive's element into a specified place in the template of the directive.
-                        The benefit of transclusion, over simply moving the DOM elements manually, is that the transcluded
-                        content has access to the properties on the scope from which it was taken, even if the directive
-                        has isolated scope.
-                        <br><br>
-                        This makes it possible for the widget to have private state for its template, while the transcluded
-                        content has access to its originating scope.
-                        <br><br>
-                        **Note:** When testing an element transclude directive you must not place the directive at the root
-                        of the DOM fragment that is being compiled.
-                    </aside>
-                </section>
-                <section>
-                    <h2>
-                        Practical Idea
-                    </h2>
-
-                    <p class="fragment">
-                        Allowing a user to pass in a template to be used in your directive...
-                    </p>
-
-                    <p class="fragment">
-                        Open/Closed Principle
-                    </p>
-                </section>
-                <section>
-                    <h2>Template Example of Transclusion</h2>
-                <pre>
-                    <code data-trim contenteditable>
-                        <div>
-                            <h2>This is the template of the directive</h2>
-                            <ng-transclude></ng-transclude>
-                        </div>
-                    </code>
-                </pre>
-                </section>
-                <section>
-                    <h2>Code Example of Transclusion</h2>
-                <pre>
-                    <code>
-                        ... link: function (scope, element, attrs, ctrl, transclude) {
-                        transclude(scope, function (clone) {
-                        clone.after(element);
-                        });
-                        transclude(scope, function (clone) {
-                        clone.after(element);
-                        });
-                        }
-                    </code>
-                </pre>
-                </section>
-                <section>
-                    <h2>
-                        Pitfalls
-                    </h2>
-                    <p>
-                        ngTransclude and the digest cycle...
-                    </p>
-                    <p>
-                        Remember you are in the deepest bowels of Ng
-                    </p>
-                </section>
+                <p class="fragment">
+                    Isn't this what Thoreau and Emerson where into?
+                    <image data-src="images/thoreau.jpg"></image>
+                </p>
             </section>
+            <section>
+                <h2>
+                    Overview
+                </h2>
 
+                <p class="fragment">
+                    Copying a collection of DOM elements
+                </p>
+
+                <p class="fragment">
+                    Putting them into a different part of the DOM<br>
+                    (potentially multiple times)
+                </p>
+
+                <p class="fragment">
+                    The copies maintain their link to the parent scope
+                </p>
+
+                <p class="fragment">
+                    Digest cycles maybe triggered for this...
+                </p>
+
+            <pre class="fragment">
+                <code>
+                    //Directive definition
+                    ...
+                    tranclude: true,
+                    ...
+                    //OR
+                    ...
+                    transclude: 'element',
+                    ...
+                </code>
+            </pre>
+
+                <aside class="notes">
+                    Transclusion
+                    <br><br>
+                    Transclusion is the process of extracting a collection of DOM element from one part of the DOM and
+                    copying them to another part of the DOM, while maintaining their connection to the original
+                    AngularJS
+                    scope from where they were taken.
+                    <br><br>
+                    Transclusion is used (often with ngTransclude) to insert the
+                    original contents of a directive's element into a specified place in the template of the directive.
+                    The benefit of transclusion, over simply moving the DOM elements manually, is that the transcluded
+                    content has access to the properties on the scope from which it was taken, even if the directive
+                    has isolated scope.
+                    <br><br>
+                    This makes it possible for the widget to have private state for its template, while the transcluded
+                    content has access to its originating scope.
+                    <br><br>
+                    **Note:** When testing an element transclude directive you must not place the directive at the root
+                    of the DOM fragment that is being compiled.
+                </aside>
+            </section>
+            <section>
+                <h2>
+                    Practical Idea
+                </h2>
+
+                <p class="fragment">
+                    Allowing a user to pass in a template to be used in your directive...
+                </p>
+
+                <p class="fragment">
+                    Open/Closed Principle
+                </p>
+                <pre class="fragment">
+                    <code data-trim contenteditable>
+<directive>
+    <div>
+        I will be used as the tranclusion template. <br>
+        I will have access to the parent scope.
+    </div>
+</directive>
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Template Example of Transclusion</h2>
+            <pre>
+                <code data-trim contenteditable>
+                    <div>
+                        <h2>This is the template of the directive</h2>
+                        <ng-transclude></ng-transclude>
+                    </div>
+                </code>
+            </pre>
+            </section>
+            <section>
+                <h2>Code Example of Transclusion</h2>
+            <pre>
+                <code>
+                    ... link: function (scope, element, attrs, ctrl, transclude) {
+                    transclude(scope, function (clone) {
+                    clone.after(element);
+                    });
+                    transclude(scope, function (clone) {
+                    clone.after(element);
+                    });
+                    }
+                </code>
+            </pre>
+            </section>
+            <section>
+                <h2>
+                    Pitfalls
+                </h2>
+                <p>
+                    ngTransclude and the digest cycle...
+                </p>
+                <p>
+                    Remember you are in the deepest bowels of Ng
+                </p>
+            </section>
+            <!--&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
             <section>
                 <h2>Link</h2>
 
