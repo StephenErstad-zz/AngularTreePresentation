@@ -429,25 +429,25 @@ compile: function compile(tElement, tAttrs, transcludeFn) {
                 <h2>Template Example of Transclusion</h2>
             <pre>
                 <code data-trim contenteditable>
-                    <div>
-                        <h2>This is the template of the directive</h2>
-                        <ng-transclude></ng-transclude>
-                    </div>
+<div>
+    <h2>This is the template of the directive</h2>
+    <ng-transclude></ng-transclude>
+</div>
                 </code>
             </pre>
             </section>
             <section>
                 <h2>Code Example of Transclusion</h2>
             <pre>
-                <code>
-                    ... link: function (scope, element, attrs, ctrl, transclude) {
-                    transclude(scope, function (clone) {
-                    clone.after(element);
-                    });
-                    transclude(scope, function (clone) {
-                    clone.after(element);
-                    });
-                    }
+                <code data-trim contenteditable="">
+... link: function (scope, element, attrs, ctrl, transclude) {
+    transclude(scope, function (clone) {
+        clone.after(element);
+    });
+    transclude(scope, function (clone) {
+        clone.after(element);
+    });
+}
                 </code>
             </pre>
             </section>
