@@ -792,13 +792,13 @@ function edit(node) {
     var onEditPromise = treeVm.onEdit({node: node});
 
     onEditPromise.then(function (editEvent) {
-        var nodeToEdit = treeVm.masterTree.find(displayListNode.path);
+        var nodeToEdit = treeVm.masterTree.find(editEvent.editedNode.path);
         nodeToEdit.remove();
-        parent.append(treeService.createSubTree(editedNodeAndSiblings[0], defaultNode));        
+        parent.append(treeService.createSubTree(editEvent.editedNode, defaultNode));        
 
         treeVm.displayList = treeService.topologicalSort(treeVm.masterTree);
 
-        refreshSelectedState(displayListNode.id);
+        refreshSelectedState(editEvent.editedNode.id);
     });
 }
                     </code>
